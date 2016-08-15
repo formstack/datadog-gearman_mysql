@@ -1,0 +1,5 @@
+.idea
+.vagrant
+
+# Make sure nobody commits their api key
+cookbooks/dev/attributes/datadog.rb
