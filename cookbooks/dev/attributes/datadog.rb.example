@@ -1,0 +1,1 @@
+default['datadog']['api_key'] = 'abcdefghijklmnopqrstuvwxyz0123456789'
