@@ -102,7 +102,7 @@ class GearmanMySQLCheck(AgentCheck):
 
         with closing(db.cursor(pymysql.cursors.DictCursor)) as cursor:
             cursor.execute("SELECT function_name, priority, count(*) AS cnt "
-                           "FROM gearman_queue "
+                           "FROM " + self.table + " "
                            "GROUP BY function_name, priority")
             results = cursor.fetchall()
 
