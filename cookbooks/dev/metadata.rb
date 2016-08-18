@@ -1,6 +1,6 @@
 name             'dev'
-maintainer       '...'
-maintainer_email '...'
+maintainer       'Chris Zeeb'
+maintainer_email 'chris.zeeb@gmail.com'
 license          'MIT'
 description      'Installs development environment'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
