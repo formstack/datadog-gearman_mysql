@@ -22,6 +22,9 @@ instances:
     mysql_database: 'gearmand'
     mysql_table: 'gearman_queue'
     mysql_port: 3306
+    whitelist:
+      - test_queue_one
+      - test_queue_two
 ```
 
 ## Development

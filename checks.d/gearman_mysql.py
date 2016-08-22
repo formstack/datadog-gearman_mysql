@@ -24,6 +24,7 @@ SOFTWARE.
 import pymysql
 
 from checks import AgentCheck
+from collections import defaultdict
 from contextlib import closing, contextmanager
 
 
@@ -36,7 +37,7 @@ class GearmanMySQLCheck(AgentCheck):
     def check(self, instance):
         collected_metrics = None
 
-        host, user, password, database, table, port = \
+        host, user, password, database, table, port, whitelist = \
             self._get_config(instance)
 
         if (not host or not user):
@@ -48,14 +49,26 @@ class GearmanMySQLCheck(AgentCheck):
             except Exception:
                 self.log.exception("error!")
 
+        # Queues in the whitelist are assigned 0 for each priority
+        # It is overwritten later if there are jobs in the queue for that priority
+        # This way we do not return no data for these queues, which can lead to misleading graphs
+        queues = defaultdict(lambda: defaultdict(dict, {0:0, 1:0, 2:0}))
+        for queue in whitelist:
+            for priority in [0, 1, 2]:
+                queues[queue][priority] = 0
+
         for collected_metric in collected_metrics:
-            gauge_tags = [
-                'queue:%s' % collected_metric['function_name'],
-                'priority:%s' % str(collected_metric['priority']),
-            ]
-            self.gauge('gearman_mysql.queue',
-                       collected_metric['cnt'],
-                       gauge_tags)
+            queues[collected_metric['function_name']][collected_metric['priority']] = collected_metric['cnt']
+
+        for queue in queues:
+            for priority in [0, 1, 2]:
+                gauge_tags = [
+                    'queue:%s' % queue,
+                    'priority:%s' % priority,
+                ]
+                self.gauge('gearman_mysql.queue',
+                           queues[queue][priority],
+                           gauge_tags)
 
     def _get_config(self, instance):
         self.host = instance.get('mysql_host', '')
@@ -64,9 +77,10 @@ class GearmanMySQLCheck(AgentCheck):
         self.database = instance.get('mysql_database', 'gearmand')
         self.table = instance.get('mysql_table', 'gearman_queue')
         self.port = instance.get('mysql_port', 3306)
+        self.whitelist = instance.get('whitelist', [])
 
         return (self.host, self.user, self.password, self.database,
-                self.table, self.port)
+                self.table, self.port, self.whitelist)
 
     @contextmanager
     def _connect(self, host, user, password, port, database):
