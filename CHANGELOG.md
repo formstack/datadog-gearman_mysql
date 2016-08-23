@@ -2,6 +2,11 @@
 
 This file is used to list changes made in each version.
 
+## 0.2.0 / 2016-08-23
+
+### Added
+* Whitelist option - will always return 0 for all priorities when there are no jobs.
+
 ## 0.1.1 / 2016-08-18
 
 ### Fixed
