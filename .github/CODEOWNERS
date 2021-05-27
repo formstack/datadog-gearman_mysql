@@ -2,7 +2,6 @@
 # This file is managed by Terraform directly with the repository itself.
 
 # Global owner of repository
-# Github teams are in a transition period.  @formstack/devops will be going away.
-* @formstack/fs-devops @formstack/devops
+* @formstack/fs-devops
 
 
